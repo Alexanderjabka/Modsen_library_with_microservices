@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # Eureka Server
+  eureka-server:
+    build:
+      context: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    networks:
+      - app-network
+
+  # Book Service
+  book-service:
+    build:
+      context: ./book-service
+    container_name: book-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://book-db:5432/db_for_books
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - book-db
+    networks:
+      - app-network
+
+  # Library Service
+  library-service:
+    build:
+      context: ./library-service
+    container_name: library-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://library-db:5432/db_for_library_records
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - library-db
+
+    networks:
+      - app-network
+
+  # PostgreSQL for Book Service
+  book-db:
+    image: postgres:15
+    container_name: db_for_books
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db_for_books
+    ports:
+      - "5435:5432"
+    networks:
+      - app-network
+
+  # PostgreSQL for Library Service
+  library-db:
+    image: postgres:15
+    container_name: db_for_library_records
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db_for_library_records
+    ports:
+      - "5436:5432"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
