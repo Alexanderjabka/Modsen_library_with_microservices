@@ -1,9 +1,8 @@
 package org.example.libraryservice.controllers;
 
-import org.example.libraryservice.DTO.LibraryDTO;
+
 import org.example.libraryservice.DTO.LibraryResponse;
 import org.example.libraryservice.services.LibraryService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,13 +39,13 @@ public class LibraryController {
     @PostMapping("/borrow/{bookId}")
     public ResponseEntity<String> borrowBook(@PathVariable Long bookId) {
         libraryService.borrowBook(bookId);
-        return ResponseEntity.status(201).body("Book with bookId" + " " + bookId + "borrowed successfully");
+        return ResponseEntity.status(201).body("Book with bookId" + ": " + bookId + " borrowed successfully");
     }
 
     @PostMapping("/return/{bookId}")
     public ResponseEntity<String> returnBook(@PathVariable Long bookId) {
         libraryService.returnBook(bookId);
-        return ResponseEntity.status(201).body("Book with bookId" + " " + bookId + "returned successfully");
+        return ResponseEntity.status(201).body("Book with bookId" + ": " + bookId + " returned successfully");
     }
 
 }

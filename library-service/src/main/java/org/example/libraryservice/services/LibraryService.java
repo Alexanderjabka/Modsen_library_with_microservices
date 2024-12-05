@@ -1,7 +1,8 @@
 package org.example.libraryservice.services;
 
-import org.example.libraryservice.DTO.LibraryDTO;
 import org.example.libraryservice.DTO.LibraryResponse;
+import org.example.libraryservice.exceptions.AlreadyTakenRecord;
+import org.example.libraryservice.exceptions.RecordNotFound;
 import org.example.libraryservice.models.Library;
 import org.example.libraryservice.repositories.LibraryRepository;
 import org.modelmapper.ModelMapper;
@@ -32,10 +33,10 @@ public class LibraryService {
     }
     public void borrowBook(Long bookId) {
         Library record = libraryRepository.findByBookId(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found in library records"));
+                .orElseThrow(() -> new RecordNotFound("Book not found in library records"));
 
         if (!record.isAvailable()) {
-            throw new RuntimeException("Book is already borrowed");
+            throw new AlreadyTakenRecord("Book is already borrowed");
         }
         LocalDateTime nowMoscow = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
 
@@ -47,7 +48,7 @@ public class LibraryService {
 
     public void returnBook(Long bookId) {
         Library record = libraryRepository.findByBookId(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found in library records"));
+                .orElseThrow(() -> new RecordNotFound("Book not found in library records"));
 
         record.setAvailable(true);
         record.setBorrowedAt(null);
@@ -69,7 +70,7 @@ public class LibraryService {
     }
     public void deleteLibraryRecord(Long bookId){
         Library libraryRecord = libraryRepository.findByBookId(bookId)
-                .orElseThrow(() -> new RuntimeException("No library record found for bookId: " + bookId));
+                .orElseThrow(() -> new RecordNotFound("No library record found for bookId: " + bookId));
 
         libraryRepository.delete(libraryRecord);
     }
