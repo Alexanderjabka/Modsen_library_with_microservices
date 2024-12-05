@@ -15,4 +15,6 @@ public class LibraryResponse {
     private LocalDateTime borrowedAt;
     private LocalDateTime dueAt;
     private boolean isAvailable;
+
+
 }
